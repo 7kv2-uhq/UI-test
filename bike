@@ -1,8 +1,6 @@
 -- Script Bike of Hell - Rayfield UI
--- Game: https://www.roblox.com/games/142823291/Bike-of-Hell
 
-if game.PlaceId == 142823291 then
-    -- Chargement de la bibliothèque Rayfield
+-- Chargement de la bibliothèque Rayfield
     local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
     -- Création de la fenêtre principale
