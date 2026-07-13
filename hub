@@ -1,0 +1,61 @@
+-- Script 3 : UI externe - Rogue Hub style
+if game.PlaceId == 142823291 then
+    -- Charge un hub externe (exemple : Rogue Hub)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Kitzoon/Rogue-Hub/main/Main.lua", true))()
+
+    -- Fonctions supplémentaires simples
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+
+    -- Auto Farm simple (collection de pièces)
+    _G.AutoFarmCoins = false
+    spawn(function()
+        while wait(0.5) do
+            if _G.AutoFarmCoins then
+                -- Simule la collecte de pièces
+                for _, v in pairs(workspace:GetDescendants()) do
+                    if v:IsA("Part") and v.Name:find("Coin") then
+                        -- Teleport au coin
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                        wait(0.1)
+                    end
+                end
+            end
+        end
+    end)
+
+    -- Commande pour activer/désactiver le farm
+    _G.ToggleFarm = function()
+        _G.AutoFarmCoins = not _G.AutoFarmCoins
+        print("Auto Farm : " .. tostring(_G.AutoFarmCoins))
+    end
+
+    -- ESP simple (affiche les noms des joueurs)
+    _G.ESPEnabled = false
+    spawn(function()
+        while wait(0.1) do
+            if _G.ESPEnabled then
+                for _, v in pairs(Players:GetPlayers()) do
+                    if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+                        -- Créer un billboard pour afficher le nom
+                        local bill = Instance.new("BillboardGui")
+                        bill.Size = UDim2.new(0, 100, 0, 30)
+                        bill.Adornee = v.Character.Head
+                        bill.Parent = v.Character.Head
+                        local label = Instance.new("TextLabel")
+                        label.Size = UDim2.new(1, 0, 1, 0)
+                        label.BackgroundTransparency = 1
+                        label.Text = v.Name
+                        label.TextColor3 = Color3.fromRGB(255, 0, 0)
+                        label.TextScaled = true
+                        label.Parent = bill
+                        wait(0.5)
+                        bill:Destroy()
+                    end
+                end
+            end
+        end
+    end)
+
+    print("Script 3 chargé ! Utilise _G.ToggleFarm() pour le farm")
+end
