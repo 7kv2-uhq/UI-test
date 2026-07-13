@@ -1,0 +1,97 @@
+-- Script 2 : UI Custom - Fonctions simples (Kill, Teleport, ESP)
+if game.PlaceId == 142823291 then
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+
+    -- Création de la GUI
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "MM2_CustomUI"
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 350, 0, 400)
+    MainFrame.Position = UDim2.new(0.5, -175, 0.5, -200)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    MainFrame.BackgroundTransparency = 0.1
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+
+    -- Titre
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 40)
+    Title.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+    Title.Text = "MM2 Simple Hub"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextScaled = true
+    Title.Parent = MainFrame
+
+    -- Fonction pour créer des boutons
+    local function CreateButton(parent, text, yPos, callback)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0.8, 0, 0, 35)
+        btn.Position = UDim2.new(0.1, 0, 0, yPos)
+        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+        btn.Text = text
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextScaled = true
+        btn.Parent = parent
+        btn.MouseButton1Click:Connect(callback)
+        return btn
+    end
+
+    -- Bouton ESP
+    CreateButton(MainFrame, "Activer ESP", 50, function()
+        print("ESP activé")
+        -- Logique ESP ici
+    end)
+
+    -- Bouton Kill All
+    CreateButton(MainFrame, "Kill All (Murderer)", 95, function()
+        print("Kill All exécuté")
+        for _, v in pairs(Players:GetPlayers()) do
+            if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") then
+                v.Character.Humanoid.Health = 0
+            end
+        end
+    end)
+
+    -- Bouton Auto Farm
+    CreateButton(MainFrame, "Auto Farm ON/OFF", 140, function()
+        _G.AutoFarm = not _G.AutoFarm
+        print("Auto Farm : " .. tostring(_G.AutoFarm))
+    end)
+
+    -- Bouton Teleport Lobby
+    CreateButton(MainFrame, "Teleport Lobby", 185, function()
+        game:GetService("ReplicatedStorage"):FindFirstChild("Remotes"):FindFirstChild("Lobby"):FireServer()
+        print("Téléporté au lobby")
+    end)
+
+    -- Bouton Speed
+    CreateButton(MainFrame, "Speed x2", 230, function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 32
+        end
+    end)
+
+    -- Bouton Reset Speed
+    CreateButton(MainFrame, "Speed Normal", 275, function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        end
+    end)
+
+    -- Bouton Fermer
+    local CloseBtn = Instance.new("TextButton")
+    CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+    CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    CloseBtn.Text = "X"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseBtn.TextScaled = true
+    CloseBtn.Parent = MainFrame
+    CloseBtn.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+end
