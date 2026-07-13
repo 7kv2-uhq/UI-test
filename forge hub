@@ -1,0 +1,94 @@
+-- Script 4 : UI Forge Hub - Configurable
+if game.PlaceId == 142823291 then
+    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+    
+    local Window = Rayfield:CreateWindow({
+        Name = "Forge MM2",
+        LoadingTitle = "Forge Hub",
+        LoadingSubtitle = "v2.0",
+        Theme = "Dark",
+        ConfigurationSaving = {
+            Enabled = true,
+            FolderName = "ForgeMM2",
+            FileName = "Config"
+        },
+        KeySystem = false
+    })
+
+    -- Onglet Combat
+    local CombatTab = Window:CreateTab("Combat", nil)
+    CombatTab:CreateSection("Aimbot & Kill")
+    
+    CombatTab:CreateToggle({
+        Name = "Silent Aim",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.SilentAim = Value
+            print("Silent Aim : " .. tostring(Value))
+        end
+    })
+    
+    CombatTab:CreateButton({
+        Name = "Kill All",
+        Callback = function()
+            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") then
+                    v.Character.Humanoid.Health = 0
+                end
+            end
+        end
+    })
+
+    -- Onglet Visuals
+    local VisualTab = Window:CreateTab("Visuals", nil)
+    VisualTab:CreateSection("ESP")
+    
+    VisualTab:CreateToggle({
+        Name = "ESP Murderer",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.ESPMurderer = Value
+            print("ESP Murderer : " .. tostring(Value))
+        end
+    })
+    
+    VisualTab:CreateToggle({
+        Name = "ESP Sheriff",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.ESPSheriff = Value
+            print("ESP Sheriff : " .. tostring(Value))
+        end
+    })
+
+    -- Onglet Farm
+    local FarmTab = Window:CreateTab("Farm", nil)
+    FarmTab:CreateSection("Auto Farm")
+    
+    FarmTab:CreateToggle({
+        Name = "Auto Farm Coins",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.AutoFarm = Value
+            print("Auto Farm : " .. tostring(Value))
+        end
+    })
+    
+    FarmTab:CreateSlider({
+        Name = "Vitesse de Farm",
+        Range = {1, 10},
+        Increment = 0.5,
+        CurrentValue = 2,
+        Callback = function(Value)
+            _G.FarmSpeed = Value
+            print("Farm Speed : " .. tostring(Value))
+        end
+    })
+
+    -- Notification de démarrage
+    Rayfield:Notify({
+        Title = "Forge Hub",
+        Content = "Prêt à l'emploi !",
+        Duration = 3
+    })
+end
