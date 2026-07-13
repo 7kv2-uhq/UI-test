@@ -1,0 +1,345 @@
+-- Script Bike of Hell - Rayfield UI
+-- Game: https://www.roblox.com/games/142823291/Bike-of-Hell
+
+if game.PlaceId == 142823291 then
+    -- Chargement de la bibliothèque Rayfield
+    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+    -- Création de la fenêtre principale
+    local Window = Rayfield:CreateWindow({
+        Name = "Bike of Hell Hub",
+        LoadingTitle = "Chargement...",
+        LoadingSubtitle = "by ScriptHub",
+        Theme = "DarkBlue",
+        ConfigurationSaving = {
+            Enabled = true,
+            FolderName = "BikeOfHellHub",
+            FileName = "Config"
+        },
+        KeySystem = false,
+        ToggleUIKeybind = "K",  -- Appuyez sur K pour afficher/masquer l'UI
+        DisableBuildWarnings = false
+    })
+
+    -- ============================================
+    -- ONGLET : MOUVEMENT
+    -- ============================================
+    local MoveTab = Window:CreateTab("Mouvement", nil)
+
+    local MoveSection = MoveTab:CreateSection("Vitesse & Saut")
+
+    -- Speed Boost
+    MoveTab:CreateSlider({
+        Name = "Vitesse de la moto",
+        Range = {16, 500},
+        Increment = 1,
+        CurrentValue = 16,
+        Callback = function(Value)
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.WalkSpeed = Value
+            end
+        end
+    })
+
+    -- Jump Boost
+    MoveTab:CreateSlider({
+        Name = "Hauteur de saut",
+        Range = {50, 500},
+        Increment = 5,
+        CurrentValue = 50,
+        Callback = function(Value)
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.JumpPower = Value
+            end
+        end
+    })
+
+    -- Noclip (passer à travers les obstacles)
+    MoveTab:CreateToggle({
+        Name = "Noclip",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.Noclip = Value
+            if Value then
+                print("Noclip activé")
+                -- Boucle Noclip
+                spawn(function()
+                    while _G.Noclip do
+                        wait(0.1)
+                        local char = game.Players.LocalPlayer.Character
+                        if char then
+                            for _, part in pairs(char:GetDescendants()) do
+                                if part:IsA("BasePart") then
+                                    part.CanCollide = false
+                                end
+                            end
+                        end
+                    end
+                end)
+            else
+                print("Noclip désactivé")
+                -- Rétablir la collision
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    for _, part in pairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                        end
+                    end
+                end
+            end
+        end
+    })
+
+    -- ============================================
+    -- ONGLET : AUTO FARM
+    -- ============================================
+    local FarmTab = Window:CreateTab("Auto Farm", nil)
+
+    local FarmSection = FarmTab:CreateSection("Farming automatique")
+
+    -- Auto Farm (collecte de pièces)
+    FarmTab:CreateToggle({
+        Name = "Auto Farm Pièces",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.AutoFarm = Value
+            if Value then
+                print("Auto Farm activé")
+                spawn(function()
+                    while _G.AutoFarm do
+                        wait(0.2)
+                        local lp = game.Players.LocalPlayer
+                        local char = lp.Character
+                        if char and char:FindFirstChild("HumanoidRootPart") then
+                            -- Cherche les pièces autour
+                            for _, v in pairs(workspace:GetDescendants()) do
+                                if v:IsA("Part") and v.Name:find("Coin") then
+                                    -- Se téléporte sur la pièce
+                                    char.HumanoidRootPart.CFrame = v.CFrame
+                                    wait(0.1)
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end)
+            else
+                print("Auto Farm désactivé")
+            end
+        end
+    })
+
+    -- Auto Redémarrer la course
+    FarmTab:CreateToggle({
+        Name = "Auto Restart (course terminée)",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.AutoRestart = Value
+            if Value then
+                print("Auto Restart activé")
+                spawn(function()
+                    while _G.AutoRestart do
+                        wait(1)
+                        -- Vérifie si la course est terminée
+                        local gui = game.Players.LocalPlayer.PlayerGui
+                        if gui:FindFirstChild("FailGui") or gui:FindFirstChild("WinGui") then
+                            -- Appuie sur le bouton de redémarrage
+                            for _, btn in pairs(gui:GetDescendants()) do
+                                if btn:IsA("TextButton") and (btn.Name:find("Restart") or btn.Text:find("Restart")) then
+                                    btn:FireServer()
+                                    wait(0.5)
+                                end
+                            end
+                        end
+                    end
+                end)
+            else
+                print("Auto Restart désactivé")
+            end
+        end
+    })
+
+    -- ============================================
+    -- ONGLET : ESP & VISUELS
+    -- ============================================
+    local VisualTab = Window:CreateTab("Visuels", nil)
+
+    local VisualSection = VisualTab:CreateSection("ESP et effets")
+
+    -- ESP Joueurs
+    VisualTab:CreateToggle({
+        Name = "ESP Joueurs",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.ESP = Value
+            if Value then
+                print("ESP activé")
+                spawn(function()
+                    while _G.ESP do
+                        wait(0.5)
+                        for _, player in pairs(game.Players:GetPlayers()) do
+                            if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+                                local head = player.Character.Head
+                                local bill = Instance.new("BillboardGui")
+                                bill.Size = UDim2.new(0, 100, 0, 30)
+                                bill.Adornee = head
+                                bill.Parent = head
+                                local label = Instance.new("TextLabel")
+                                label.Size = UDim2.new(1, 0, 1, 0)
+                                label.BackgroundTransparency = 1
+                                label.Text = player.Name
+                                label.TextColor3 = Color3.fromRGB(255, 0, 0)
+                                label.TextScaled = true
+                                label.Parent = bill
+                                wait(0.5)
+                                bill:Destroy()
+                            end
+                        end
+                    end
+                end)
+            else
+                print("ESP désactivé")
+            end
+        end
+    })
+
+    -- Fullbright (éclairage maximal)
+    VisualTab:CreateToggle({
+        Name = "Fullbright",
+        CurrentValue = false,
+        Callback = function(Value)
+            if Value then
+                game.Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+                game.Lighting.Brightness = 2
+                game.Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+            else
+                game.Lighting.Ambient = Color3.fromRGB(127, 127, 127)
+                game.Lighting.Brightness = 1
+                game.Lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
+            end
+        end
+    })
+
+    -- ============================================
+    -- ONGLET : TÉLÉPORTATION
+    -- ============================================
+    local TeleportTab = Window:CreateTab("Téléportation", nil)
+
+    local TeleportSection = TeleportTab:CreateSection("Se déplacer rapidement")
+
+    -- Téléportation au spawn
+    TeleportTab:CreateButton({
+        Name = "Téléporter au spawn",
+        Callback = function()
+            local lp = game.Players.LocalPlayer
+            local char = lp.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local spawn = workspace:FindFirstChild("SpawnLocation")
+                if spawn then
+                    char.HumanoidRootPart.CFrame = spawn.CFrame
+                end
+            end
+        end
+    })
+
+    -- Téléportation à un joueur
+    TeleportTab:CreateButton({
+        Name = "Téléporter à un joueur",
+        Callback = function()
+            local players = game.Players:GetPlayers()
+            local target = nil
+            -- Sélectionne le premier joueur disponible (autre que soi)
+            for _, p in pairs(players) do
+                if p ~= game.Players.LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    target = p
+                    break
+                end
+            end
+            if target then
+                local lp = game.Players.LocalPlayer
+                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                    lp.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame
+                    Rayfield:Notify({
+                        Title = "Téléportation",
+                        Content = "Téléporté à " .. target.Name,
+                        Duration = 3
+                    })
+                end
+            else
+                Rayfield:Notify({
+                    Title = "Erreur",
+                    Content = "Aucun joueur disponible",
+                    Duration = 3
+                })
+            end
+        end
+    })
+
+    -- ============================================
+    -- ONGLET : DIVERS
+    -- ============================================
+    local MiscTab = Window:CreateTab("Divers", nil)
+
+    local MiscSection = MiscTab:CreateSection("Autres fonctions")
+
+    -- Infinite Jump (saut infini)
+    MiscTab:CreateToggle({
+        Name = "Infinite Jump",
+        CurrentValue = false,
+        Callback = function(Value)
+            _G.InfiniteJump = Value
+            if Value then
+                print("Infinite Jump activé")
+                game:GetService("UserInputService").JumpRequest:Connect(function()
+                    if _G.InfiniteJump then
+                        local char = game.Players.LocalPlayer.Character
+                        if char and char:FindFirstChild("Humanoid") then
+                            char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                        end
+                    end
+                end)
+            else
+                print("Infinite Jump désactivé")
+            end
+        end
+    })
+
+    -- Réinitialiser la moto
+    MiscTab:CreateButton({
+        Name = "Réinitialiser la moto",
+        Callback = function()
+            local lp = game.Players.LocalPlayer
+            if lp.Character then
+                lp.Character:BreakJoints()
+                wait(1)
+                lp:LoadCharacter()
+                Rayfield:Notify({
+                    Title = "Réinitialisation",
+                    Content = "Moto réinitialisée",
+                    Duration = 3
+                })
+            end
+        end
+    })
+
+    -- ============================================
+    -- NOTIFICATION DE DÉMARRAGE
+    -- ============================================
+    Rayfield:Notify({
+        Title = "Bike of Hell Hub",
+        Content = "Script chargé ! Appuyez sur K pour l'UI",
+        Duration = 5
+    })
+
+    print("Bike of Hell Hub chargé avec succès !")
+else
+    -- Message d'erreur si le jeu n'est pas Bike of Hell
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Erreur",
+        Text = "Ce script est conçu pour Bike of Hell !",
+        Duration = 5
+    })
+end
